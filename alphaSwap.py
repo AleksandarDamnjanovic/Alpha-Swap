@@ -1,10 +1,10 @@
 '''
 Created by Aleksandar Damnjanovic
 Date: 13.11.2021
+Last edit: 22.11.2021
 '''
 
 from io import FileIO
-import dictionaries as d
 import os
 import docx2txt
 import pdfplumber
@@ -12,22 +12,33 @@ import string
 
 class alphaSwap:
 
-    @staticmethod
-    def swapRawText(text):
+    def __init__(self) -> None:
+        self.d= self.parseCSV()
+
+    def parseCSV(self):
+        file= open('dictionary.csv', 'r')
+        content= file.read()
+        content=content.split('\n')
+        _d= dict()
+        for dd in content:
+            dd= dd.split(',')
+            _d[dd[0]]= dd[1]
+        return _d
+
+    def swapRawText(self, text):
         letter=""
         for c in text:
             try:
-                letter+=str(d.base[c])
+                letter+=str(self.d[c])
             except:
                 letter+=str(c)
         return letter
 
-    @staticmethod
-    def swapTextFile(path):
+    def swapTextFile(self, path):
         file= open(path, "r")
         text= file.read()
         file.close()
-        t= alphaSwap.swapRawText(text)
+        t= self.swapRawText(text)
         fname= os.path.basename(path)
         nname= "swap_"+fname+".txt"
         fpath= str.replace(path, fname,"")
@@ -37,10 +48,9 @@ class alphaSwap:
         file.close()
         print("swap completed")
         
-    @staticmethod
-    def swapDocxFile(path):
+    def swapDocxFile(self, path):
         text= docx2txt.process(path)
-        t= alphaSwap.swapRawText(text)
+        t= self.swapRawText(text)
         fname= os.path.basename(path)
         nname= "swap_"+fname+".txt"
         fpath= str.replace(path, fname,"")
@@ -50,10 +60,13 @@ class alphaSwap:
         file.close()
         print("swap completed")
 
-    @staticmethod
-    def swapPdfFile(path):
+    def swapPdfFile(self, path):
         text= pdfplumber.open(path)
-        t= alphaSwap.swapRawText(text.pages[0].extract_text())
+
+        t=''
+        for p in text.pages:
+            t+= self.swapRawText(p.extract_text())
+
         fname= os.path.basename(path)
         nname= "swap_"+fname+".txt"
         fpath= str.replace(path, fname,"")
@@ -63,8 +76,7 @@ class alphaSwap:
         file.close()
         print("swap completed")
 
-    @staticmethod
-    def processDirectory(path):
+    def processDirectory(self, path):
         l=os.listdir(path)
         d=''
         for file in l:
@@ -74,8 +86,8 @@ class alphaSwap:
                     d+=os.sep
                  
             if (d+file).endswith(".pdf"):
-                alphaSwap.swapPdfFile(d+file)
+                self.swapPdfFile(d+file)
             elif (d+file).endswith(".docx"):
-                alphaSwap.swapDocxFile(d+file)
+                self.swapDocxFile(d+file)
             elif (d+file).endswith(".txt"):
-                alphaSwap.swapTextFile(d+file)
+                self.swapTextFile(d+file)
