@@ -39,7 +39,7 @@ script to fit your purpose.
     + За један документ `run.py "путања"`
     + За садржај читавог директоријума(у овом случају треба бити предата путања до директоријума) `run.py "путања" -dir`
 
-    Examples:
+    Примери:
 
     + `run.py -raw "текст за измену"`
     + `run.py "/media/harddrive/file.txt"`
